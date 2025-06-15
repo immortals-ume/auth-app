@@ -1,0 +1,25 @@
+package com.immortals.authapp.constants;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public class AuthAppConstant {
+    public static final String MOBILE_REGEX_INDIA = "^[6-9]\\\\d{9}$";
+    public static final String PASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#$@!%&*?])[A-Za-z\\d#$@!%&*?]{8,16}$";
+    public static final String EMAIL_REGEX = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
+    public static final String TOKEN_PREFIX = "Bearer ";
+    public static final String HEADER_STRING = "Authorization";
+
+    public static final String MDC_USER_AGENT_KEY = "userAgent";
+
+    public static final Long MAX_AGE_CORS_SECS = 86400L;
+    public static final Long MAX_AGE_HSTS_SECS = 86400L;
+
+
+    public static final int MAX_TOKENS = 100;     // max tokens in bucket
+    public static final int REFILL_TOKENS_PER_SECONDS = 10;
+
+}

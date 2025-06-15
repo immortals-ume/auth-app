@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Create Sequence -->
+    <changeSet id="1" author="kaish">
+        <createSequence sequenceName="user_sequence"
+                        schemaName="auth"
+                        startValue="1"
+                        incrementBy="1"/>
+    </changeSet>
+
+    <!-- Create users table -->
+    <changeSet id="2" author="kaish">
+        <createTable tableName="users" schemaName="auth">
+            <column name="user_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_name" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(120)"/>
+            <column name="email" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email_verified" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="auth_provider" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="login_time" type="TIMESTAMP"/>
+            <column name="logout_time" type="TIMESTAMP"/>
+            <column name="created_by" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="BIGINT"/>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="active_ind" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Indexes -->
+    <changeSet id="3" author="kaish">
+        <createIndex indexName="idx_user_username" tableName="users" schemaName="auth">
+            <column name="email"/>
+        </createIndex>
+        <createIndex indexName="idx_user_email" tableName="users" schemaName="auth">
+            <column name="phone"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Join Table: user_authority -->
+    <changeSet id="4" author="kaish">
+        <createTable tableName="user_authority" schemaName="auth">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authority_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Join Table: user_role -->
+    <changeSet id="5" author="kaish">
+        <createTable tableName="role" schemaName="auth">
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
