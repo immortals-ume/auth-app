@@ -79,7 +79,7 @@ jobs:
       - name: 🛠 Bump Patch Version in pom.xml
         id: version
         run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          VERSION=$(mvn help:evaluate -Dexpression=parent.version -q -DforceStdout)
           NEW_VERSION=$(echo $VERSION | awk -F. '{$NF += 1; OFS="."; print}')
           mvn versions:set -DnewVersion=$NEW_VERSION
           mvn versions:commit
