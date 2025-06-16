@@ -89,7 +89,7 @@ jobs:
       - name: 🔁 Commit Version Bump
         run: |
           git config user.name ${{ github.actor }}
-          git config user.email "kaish127799@github.com"
+          git config user.email "kaish1277999@github.com"
           git add pom.xml
           git commit -m "chore(release): bump version to ${{ env.VERSION }}"
           git push origin HEAD:${{ github.ref_name }}
