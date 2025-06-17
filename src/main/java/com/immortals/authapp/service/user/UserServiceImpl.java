@@ -25,8 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.ZoneId;
 
-@Service
 @Slf4j
+@Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     private final StateService stateService;
     private final UserRepository userRepository;
 
-    private final CacheService<String,User> cacheService;
+    private final CacheService<String, User> cacheService;
 
     public UserServiceImpl(UserRepository userRepo, UserAddressRepository userAddressRepo, PasswordEncoder passwordEncoder, CityService cityService, CountryService countryService, StateService stateService, UserRepository userRepository, CacheService<String, User> cacheService) {
         this.userRepo = userRepo;
@@ -54,16 +54,17 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = {Exception.class})
     @Override
-    public User register(RegisterRequestDTO dto) {
+    public UserDto register(RegisterRequestDTO dto) {
         try {
             if (userRepo.existsByEmail(dto.email()) || userRepo.existsByUserName(dto.userName())) {
-                throw new UserException("Email or Username already exists");
+                throw new UserException("User registration failed: Email or username already exists.");
             }
 
             if (!dto.password()
                     .equals(dto.reTypePassword())) {
-                throw new UserException("Password and re-typed password do not match. Please try again.");
+                throw new UserException("Password confirmation does not match the original password.");
             }
+
             User user = User.builder()
                     .firstName(dto.firstName())
                     .middleName(dto.middleName())
@@ -84,16 +85,17 @@ public class UserServiceImpl implements UserService {
                     .activeInd(Boolean.TRUE)
                     .build();
 
+            log.info("New user registered successfully: [username={}]", user.getUserName());
+            User savedUser = userRepo.saveAndFlush(user);
 
-            log.info("Registered user: {}", user.getUserName());
+            return new UserDto(savedUser.getFirstName(), savedUser.getMiddleName(), savedUser.getLastName(), savedUser.getUserName(), savedUser.getEmail(), savedUser.getPhoneCode(), dto.contactNumber());
 
-            return userRepo.saveAndFlush(user);
         } catch (IllegalArgumentException e) {
-            log.warn("Registration failed: {}", e.getMessage());
+            log.warn("User registration failed due to invalid input: {}", e.getMessage());
             throw new UserException(e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Unexpected error during user registration", e);
-            throw new UserException(e.getMessage(), e);
+            log.error("System error occurred during user registration: {}", e.getMessage(), e);
+            throw new UserException("An unexpected error occurred during registration. Please contact support.", e);
         }
     }
 
@@ -107,21 +109,20 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedBy(UserTypes.SYSTEM.name());
             user.setUpdatedDate(DateTimeUtils.now());
 
-            log.info("Login time updated for user ID: {}", username);
+            log.info("Login timestamp updated for user: [username={}]", username);
             return userRepository.saveAndFlush(user);
 
-
         } catch (ResourceNotFoundException e) {
-            log.warn("Login time  update failed - user not found: {}", username);
+            log.warn("Login update failed: User not found with username={}", username);
             throw new UserException(e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Unexpected error during Login time  update for user ID {}", username, e);
-            throw new UserException("Failed to update Login time. Please try again later.");
+            log.error("Error while updating login timestamp for user [username={}]: {}", username, e.getMessage(), e);
+            throw new UserException("Failed to update login time. Please try again later.");
         }
     }
 
-    @Override
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = {Exception.class})
+    @Override
     public User updateLogoutStatus(String username) {
         try {
             User user = getUserByUsername(username);
@@ -130,16 +131,15 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedBy(UserTypes.SYSTEM.name());
             user.setUpdatedDate(DateTimeUtils.now());
 
-            log.info("LogOut time updated for user ID: {}", username);
+            log.info("Logout timestamp updated for user: [username={}]", username);
             return userRepository.saveAndFlush(user);
 
-
         } catch (ResourceNotFoundException e) {
-            log.warn("LogOut time  update failed - user not found: {}", username);
+            log.warn("Logout update failed: User not found with username={}", username);
             throw new UserException(e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Unexpected error during LogOut time  update for user ID {}", username, e);
-            throw new UserException("Failed to update LogOut time. Please try again later.");
+            log.error("Error while updating logout timestamp for user [username={}]: {}", username, e.getMessage(), e);
+            throw new UserException("Failed to update logout time. Please try again later.");
         }
     }
 
@@ -149,32 +149,34 @@ public class UserServiceImpl implements UserService {
         try {
             User cachedUser = cacheService.get(username, username);
             if (cachedUser != null) {
+                log.debug("User retrieved from cache: [username={}]", username);
                 return cachedUser;
             }
 
-
+            log.debug("Fetching user from database: [username={}]", username);
             return userRepo.findUser(username)
                     .orElseThrow(() -> new ResourceNotFoundException("User", username));
         } catch (RuntimeException e) {
-            throw new AuthException(e.getMessage());
+            log.error("Error retrieving user by username: {}", username, e);
+            throw new AuthException("Failed to retrieve user details.");
         }
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = {Exception.class})
     @Override
-    public UserAddress updateAddress(Long userId, UserAddressDTO dto) {
+    public UserAddress updateAddress(String username, UserAddressDTO dto) {
         try {
-            User user = userRepo.findById(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+            User user = userRepo.findUser(username)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", username));
 
             UserAddress address = UserAddress.builder()
                     .user(user)
-                    .addressLine1(dto.getAddressLine1())
-                    .addressLine2(dto.getAddressLine2())
-                    .city(cityService.toEntity(cityService.getById(dto.getCity())))
-                    .states(stateService.toEntity(stateService.getById(dto.getState())))
-                    .country(countryService.toEntity(countryService.getById(dto.getCountry())))
-                    .pincode(dto.getZipCode())
+                    .addressLine1(dto.addressLine1())
+                    .addressLine2(dto.addressLine2())
+                    .city(cityService.toEntity(cityService.getById(dto.city())))
+                    .states(stateService.toEntity(stateService.getById(dto.state())))
+                    .country(countryService.toEntity(countryService.getById(dto.country())))
+                    .pincode(dto.zipCode())
                     .status(AddressStatus.ACTIVE)
                     .timezone(ZoneId.systemDefault()
                             .toString())
@@ -184,15 +186,15 @@ public class UserServiceImpl implements UserService {
 
             user.getUserAddresses()
                     .add(address);
-            log.info("Address updated for user ID: {}", userId);
+
+            log.info("Address successfully updated for user: [username={}]", username);
             return userAddressRepo.saveAndFlush(address);
 
-
         } catch (ResourceNotFoundException e) {
-            log.warn("Address update failed - user not found: {}", userId);
+            log.warn("Address update failed: User not found [username={}]", username);
             throw new UserException(e.getMessage(), e);
         } catch (Exception e) {
-            log.error("Unexpected error during address update for user ID {}", userId, e);
+            log.error("System error during address update for user [username={}]: {}", username, e.getMessage(), e);
             throw new UserException("Failed to update address. Please try again later.");
         }
     }

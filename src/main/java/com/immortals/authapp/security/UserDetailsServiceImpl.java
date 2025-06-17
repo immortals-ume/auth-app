@@ -1,7 +1,6 @@
 package com.immortals.authapp.security;
 
 
-import com.immortals.authapp.manager.TokenLockManager;
 import com.immortals.authapp.model.UserPrincipal;
 import com.immortals.authapp.model.entity.Permissions;
 import com.immortals.authapp.model.entity.Roles;
@@ -9,7 +8,6 @@ import com.immortals.authapp.model.entity.User;
 import com.immortals.authapp.repository.RoleRepository;
 import com.immortals.authapp.repository.UserRepository;
 import com.immortals.authapp.service.cache.CacheService;
-import com.immortals.authapp.service.exception.AuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;

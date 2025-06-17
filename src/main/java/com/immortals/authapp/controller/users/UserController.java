@@ -3,11 +3,11 @@ package com.immortals.authapp.controller.users;
 
 import com.immortals.authapp.model.dto.RegisterRequestDTO;
 import com.immortals.authapp.model.dto.UserAddressDTO;
+import com.immortals.authapp.model.dto.UserDto;
 import com.immortals.authapp.model.entity.User;
 import com.immortals.authapp.service.user.UserService;
 import com.immortals.authapp.utils.JsonUtils;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,8 +27,7 @@ public class UserController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public User register(@Valid @RequestBody RegisterRequestDTO dto) {
-        log.info("Registering user: {}", dto.email());
+    public UserDto register(@Valid @RequestBody RegisterRequestDTO dto) {
         return userService.register(dto);
     }
 
@@ -52,10 +51,6 @@ public class UserController {
                     .body("User not authenticated");
         }
 
-        String username = auth.getName();
-
-        Long userId = userService.getUserByUsername(username).getUserId();
-
-        return ResponseEntity.ok(JsonUtils.toJson(userService.updateAddress(userId, dto)));
+        return ResponseEntity.ok(JsonUtils.toJson(userService.updateAddress(auth.getName(), dto)));
     }
 }

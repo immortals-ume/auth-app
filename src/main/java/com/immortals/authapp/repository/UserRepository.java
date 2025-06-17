@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    @EntityGraph(attributePaths = {"userAddresses"})
+    @EntityGraph(attributePaths = {"userAddresses"},type = EntityGraph.EntityGraphType.LOAD)
     @Lock(LockModeType.PESSIMISTIC_READ)
     @Query("select user from User user where user.activeInd = true and user.userName= :userNameOrEmailOrPhone or user.email = : userNameOrEmailOrPhone or user.contactNumber = :userNameOrEmailOrPhone")
     Optional<User> findUser(@Param("userNameOrEmailOrPhone") String userNameOrEmailOrPhone);
@@ -25,8 +25,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_READ)
     Boolean existsByEmail(String email);
-
-    Optional<User> findByUserName(String username);
-
-
 }

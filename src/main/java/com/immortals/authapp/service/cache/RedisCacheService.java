@@ -2,9 +2,7 @@ package com.immortals.authapp.service.cache;
 
 
 import com.immortals.authapp.manager.TokenLockManager;
-import com.immortals.authapp.service.exception.AuthException;
 import com.immortals.authapp.service.exception.CacheException;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.PreDestroy;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +13,6 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.Map;
