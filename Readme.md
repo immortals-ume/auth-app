@@ -21,6 +21,7 @@ seamless authentication experience.
 
 ### 3. OTP Service (Mobile/Email)
 
+- implemented in a separate service called OTP Service (GITHUB LINK TO BE ADDED)
 - One-time password (OTP) generation and validation for enhanced security.
 - Support for SMS and email OTP delivery.
 
@@ -53,63 +54,21 @@ seamless authentication experience.
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-repo/auth-app.git
+   git clone https://github.com/immortals-ume/auth-app.git
    cd auth-app
    ```
 2. Install dependencies:
    ```sh
    mvn clean install 
    ```
-3. Configure environment variables in `.env` or `application.properties` or `application.yml`.
+3. Configure environment variables in `.env` or `application.yml`.
+
 4. Run the application:
    ```sh
    mvn spring-boot:run
    ```
-
-## API Endpoints
-
-| Method | Endpoint         | Description                    |
-|--------|------------------|--------------------------------|
-| POST   | /auth/login      | User login                     |
-| POST   | /auth/register   | User registration              |
-| POST   | /auth/logout     | User logout                    |
-| POST   | /auth/refresh    | Token refresh                  |
-| POST   | /auth/otp        | Generate OTP                   |
-| POST   | /auth/verify-otp | Verify OTP                     |
-| GET    | /auth/oauth2     | OAuth2 authentication          |
-| GET    | /auth/user       | Get authenticated user details |
-
-## Roles and privileges - (Sample Privileges and Roles for the APP these have to be changed as per the requirement )
-
-| id | privileges             | Description                                        | country |
-|----|------------------------|----------------------------------------------------|---------|
-| 1  | READ_ALL_PRIVILEGE     | read all privilege   (Read any data in the system) |         |
-| 2  | READ_PRIVILEGE         | (read single/collection of selected entity)        |         |
-| 3  | WRITE_INSERT_PRIVILEGE | write insert Privilege  (create a new entity)      |         |
-| 4  | WRITE_UPDATE_PRIVILEGE | write update Privilege  (update a existing entity) |         |
-| 5  | DELETE_PRIVILEGE       | Delete Privilege   (SOFT delete a existing entity) |         |
-| 6  | ALL                    | Admin Privileges   ( can do  any of the above)     |         |
-| 7  | EXPORT_PRIVILEGE       | exports data privilege                             |         |
-| 8  | IMPORT_PRIVILEGE       | imports data privilege                             |         |
-| 9  | COMMUNICATION_SMS      |                                                    | IN      |
-| 10 | COMMUNICATION_WHATSAPP |                                                    | IN      |
-| 11 | COMMUNICATION_EMAIL    |                                                    | IN      |
-| 12 | COMMUNICATION_BANNER   |                                                    | IN      |
-| 13 | ACCESS_STORAGE         |                                                    | IN      |
-
-| Roles  | privileges | Description               |
-|--------|------------|---------------------------|
-| ADMIN  | ALL        | Admin have all privileges |
-| USER_2 |            |                           |
-| USER_1 |            |                           |
-| SME    |            |                           |
-| EM     |            |                           |
-| AME      |            |                           |
-
-
 ## Security Measures
 
-- Password hashing with **BCrypt**.
 - JWT-based authentication.
 - Secure HTTPS communication.
 - Rate limiting and brute force protection.
@@ -125,7 +84,7 @@ contributing.
 
 ## Contact
 
-For inquiries, contact **immortals-ume** at **immortals-ume@gmail.com**.
+For inquiries, contact **immortals-ume** at **srivastavakapil34@gmail.com**.
 
 ---
 

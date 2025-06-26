@@ -1,5 +1,7 @@
 package com.immortals.authapp.service.user;
 
+import com.immortals.authapp.annotation.ReadOnly;
+import com.immortals.authapp.annotation.WriteOnly;
 import com.immortals.authapp.model.dto.RegisterRequestDTO;
 import com.immortals.authapp.model.dto.UserAddressDTO;
 import com.immortals.authapp.model.dto.UserDto;
@@ -25,23 +27,23 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.ZoneId;
 
+import static com.immortals.authapp.constants.CacheConstants.USER_HASH_KEY;
+
+
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
-
     private final UserRepository userRepo;
     private final UserAddressRepository userAddressRepo;
     @Qualifier("passwordEncoder")
     private final PasswordEncoder passwordEncoder;
-
     private final CityService cityService;
     private final CountryService countryService;
     private final StateService stateService;
     private final UserRepository userRepository;
+    private final CacheService<String, String, User> cacheService;
 
-    private final CacheService<String, User> cacheService;
-
-    public UserServiceImpl(UserRepository userRepo, UserAddressRepository userAddressRepo, PasswordEncoder passwordEncoder, CityService cityService, CountryService countryService, StateService stateService, UserRepository userRepository, CacheService<String, User> cacheService) {
+    public UserServiceImpl(UserRepository userRepo, UserAddressRepository userAddressRepo, PasswordEncoder passwordEncoder, CityService cityService, CountryService countryService, StateService stateService, UserRepository userRepository, CacheService<String, String, User> cacheService) {
         this.userRepo = userRepo;
         this.userAddressRepo = userAddressRepo;
         this.passwordEncoder = passwordEncoder;
@@ -52,6 +54,7 @@ public class UserServiceImpl implements UserService {
         this.cacheService = cacheService;
     }
 
+    @WriteOnly
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = {Exception.class})
     @Override
     public UserDto register(RegisterRequestDTO dto) {
@@ -99,6 +102,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @WriteOnly
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = {Exception.class})
     @Override
     public User updateLoginStatus(String username) {
@@ -121,6 +125,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @WriteOnly
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = {Exception.class})
     @Override
     public User updateLogoutStatus(String username) {
@@ -143,11 +148,12 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @ReadOnly
     @Transactional
     @Override
     public User getUserByUsername(String username) {
         try {
-            User cachedUser = cacheService.get(username, username);
+            User cachedUser = cacheService.get(USER_HASH_KEY+":"+username, username, username);
             if (cachedUser != null) {
                 log.debug("User retrieved from cache: [username={}]", username);
                 return cachedUser;
@@ -162,13 +168,13 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @WriteOnly
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = {Exception.class})
     @Override
-    public UserAddress updateAddress(String username, UserAddressDTO dto) {
+    public UserAddress updateOrAddUserAddress(String username, UserAddressDTO dto) {
         try {
-            User user = userRepo.findUser(username)
-                    .orElseThrow(() -> new ResourceNotFoundException("User", username));
 
+            User user = getUserByUsername(username);
             UserAddress address = UserAddress.builder()
                     .user(user)
                     .addressLine1(dto.addressLine1())
@@ -184,11 +190,15 @@ public class UserServiceImpl implements UserService {
                     .createdBy(UserTypes.SYSTEM.name())
                     .build();
 
-            user.getUserAddresses()
-                    .add(address);
+            if (user.getUserAddresses() != null) {
 
-            log.info("Address successfully updated for user: [username={}]", username);
-            return userAddressRepo.saveAndFlush(address);
+                user.getUserAddresses()
+                        .add(address);
+
+                return saveAndUpdateUserAddress(username, address);
+            }
+
+            return saveAndUpdateUserAddress(username, address);
 
         } catch (ResourceNotFoundException e) {
             log.warn("Address update failed: User not found [username={}]", username);
@@ -197,5 +207,11 @@ public class UserServiceImpl implements UserService {
             log.error("System error during address update for user [username={}]: {}", username, e.getMessage(), e);
             throw new UserException("Failed to update address. Please try again later.");
         }
+    }
+
+    @WriteOnly
+    private UserAddress saveAndUpdateUserAddress(String username, UserAddress address) {
+        log.info("Address successfully updated for user: [username={}]", username);
+        return userAddressRepo.saveAndFlush(address);
     }
 }

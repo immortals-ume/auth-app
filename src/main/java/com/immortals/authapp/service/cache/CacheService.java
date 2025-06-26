@@ -3,28 +3,45 @@ package com.immortals.authapp.service.cache;
 import java.time.Duration;
 import java.util.Map;
 
-public interface CacheService<K, V> {
-    void put(K key, V value, Duration ttl,String lockingKey);
+public interface CacheService<H, HK, HV> {
+    /**
+     * Put a value in a Redis hash.
+     * @param hashKey the Redis hash key
+     * @param fieldKey the field within the hash
+     * @param value the value to store
+     * @param ttl time-to-live for the entire hash (not individual fields)
+     * @param lockingKey optional locking key for concurrency control
+     */
+    void put(H hashKey, HK fieldKey, HV value, Duration ttl, String lockingKey);
 
-    Boolean putIfAbsent(K key, V value, Duration ttl,String lockingKey);
+    /**
+     * Get a value from a hash field.
+     */
+    HV get(H hashKey, HK fieldKey, String lockingKey);
 
-    void putMultipleIfAbsent(Map<K, V> entries, Duration ttl,String lockingKey);
-
-    V get(K key,String lockingKey);
-
-    void remove(K key,String lockingKey);
-
-    void clear(String lockingKey);
-
-    boolean containsKey(K key,String lockingKey);
-
-    default Long getHitCount() {
-        return 0L;
-    }
-
-    default Long getMissCount() {
-        return 0L;
-    }
+    /**
+     * Remove a field from the hash.
+     */
+    void remove(H hashKey, HK fieldKey, String lockingKey);
 
 
+    /**
+     * Check if a field exists in the hash.
+     */
+    boolean containsKey(H hashKey, HK fieldKey, String lockingKey);
+
+    /**
+     * Get all fields and values from the hash.
+     */
+    Map<HK, HV> getAll(H hashKey, String lockingKey);
+
+    /**
+     * Get cache hit count.
+     */
+    default Long getHitCount() { return 0L; }
+
+    /**
+     * Get cache miss count.
+     */
+    default Long getMissCount() { return 0L; }
 }

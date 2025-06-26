@@ -22,8 +22,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static com.immortals.authapp.constants.AuthAppConstant.MAX_AGE_CORS_SECS;
-import static com.immortals.authapp.constants.AuthAppConstant.MAX_AGE_HSTS_SECS;
+import static com.immortals.authapp.constants.AuthAppConstant.*;
 
 @Configuration
 @EnableWebSecurity
@@ -73,25 +72,9 @@ public class SecurityConfig {
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/redirect",
-                                "/health",
-                                "/actuator/**",
-                                "/static/**",
-                                "/webjars/**",
-                                "/favicon.ico",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/api/v1/users/register",
-                                "/api/v1/auth/login",
-                                "api/v1/auth/logout",
-                                "api/v1/auth/remember-me/"
-
-                        )
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated()
+                        .requestMatchers(PUBLIC_RESOURCE_PATHS).permitAll()
+                        .requestMatchers(ANONYMOUS_API_PATHS).anonymous()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self' cdn.example.com; object-src 'none';"))

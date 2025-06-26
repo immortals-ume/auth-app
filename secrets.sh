@@ -27,9 +27,9 @@ docker exec -e VAULT_ADDR=$VAULT_ADDR -e VAULT_TOKEN=root $VAULT_CONTAINER_NAME 
   datasource.write.username=user \
   datasource.write.password=admin \
   datasource.write.driver-class-name=org.postgresql.Driver \
-  datasource.read.url=jdbc:postgresql://localhost:5432/user_read_db \
-  datasource.read.username=user \
-  datasource.read.password=admin \
+  datasource.read.url=jdbc:postgresql://localhost:5432/user_db \
+  datasource.read.username=replicator \
+  datasource.read.password=test \
   datasource.read.driver-class-name=org.postgresql.Driver \
   auth.jwt-issuer=https://your-issuer.example.com \
   auth.access-token-expiry-ms=900000 \

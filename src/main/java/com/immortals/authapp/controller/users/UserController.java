@@ -31,6 +31,7 @@ public class UserController {
         return userService.register(dto);
     }
 
+
     @PreAuthorize(" hasRole('ADMIN') or hasRole('ROLE_USER') and hasAnyAuthority('READ')")
     @GetMapping("/{username}")
     @ResponseStatus(HttpStatus.CREATED)
@@ -39,8 +40,7 @@ public class UserController {
     }
 
 
-
-    @PreAuthorize(" hasRole('ADMIN') or hasRole('ROLE_USER') and hasAnyAuthority('UPDATE')")
+    @PreAuthorize(" hasRole('ADMIN') or hasRole('ROLE_USER') and hasAnyAuthority('UPDATE','CREATE')")
     @PatchMapping("/address")
     public ResponseEntity<String> updateAddress(@Valid @RequestBody UserAddressDTO dto) {
         Authentication auth = SecurityContextHolder.getContext()
@@ -51,6 +51,6 @@ public class UserController {
                     .body("User not authenticated");
         }
 
-        return ResponseEntity.ok(JsonUtils.toJson(userService.updateAddress(auth.getName(), dto)));
+        return ResponseEntity.ok(JsonUtils.toJson(userService.updateOrAddUserAddress(auth.getName(), dto)));
     }
 }

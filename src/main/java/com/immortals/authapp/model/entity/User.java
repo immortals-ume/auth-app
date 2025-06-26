@@ -17,13 +17,9 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "users",
-        indexes = {
-                @Index(name = "idx_user_username", columnList = "user_name"),
-                @Index(name = "idx_user_email", columnList = "email"),
-                @Index(name = "idx_user_phone", columnList = "contactNumber")
+@Table(name = "users", indexes = {@Index(name = "idx_user_username", columnList = "user_name"), @Index(name = "idx_user_email", columnList = "email"), @Index(name = "idx_user_phone", columnList = "contactNumber")
 
-        }, uniqueConstraints = {}, schema = "auth")
+}, uniqueConstraints = {}, schema = "auth")
 
 @Getter
 @NoArgsConstructor
@@ -37,9 +33,8 @@ public class User extends Auditable<String> implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
-    @SequenceGenerator(name = "user_sequence", sequenceName = "auth.user_sequence", allocationSize = 1,
-            initialValue = 1)
-    @Column(name = "user_id",unique = true, nullable = false, updatable = false, columnDefinition = "BIGINT")
+    @SequenceGenerator(name = "user_sequence", sequenceName = "auth.user_sequence", allocationSize = 1, initialValue = 1)
+    @Column(name = "user_id", unique = true, nullable = false, updatable = false, columnDefinition = "BIGINT")
     private Long userId;
 
     @NotBlank
@@ -91,10 +86,10 @@ public class User extends Auditable<String> implements Serializable {
     @Column(name = "phone_number_verified", nullable = false)
     private Boolean phoneNumberVerified;
 
-    @Column(name = "login_time", nullable = true)
+    @Column(name = "login_time")
     private Instant login;
 
-    @Column(name = "logout_time", nullable = true)
+    @Column(name = "logout_time")
     private Instant logout;
 
     @Column(name = "account_non_expired", nullable = false)
@@ -112,16 +107,14 @@ public class User extends Auditable<String> implements Serializable {
     @Column(name = "active_ind", nullable = false)
     private Boolean activeInd;
 
-@JsonIgnore
+    @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
     private List<UserAddress> userAddresses;
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_role",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")},schema = "auth")
+
+    @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")}, schema = "auth")
     private Set<Roles> roles;
 
     @Override

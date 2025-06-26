@@ -12,7 +12,7 @@ public interface UserService {
     User updateLoginStatus(String username);
     User updateLogoutStatus(String username);
 
-    UserAddress updateAddress(String userId, UserAddressDTO addressDTO);
+    UserAddress updateOrAddUserAddress(String userId, UserAddressDTO addressDTO);
 
     User getUserByUsername(String username);
 }

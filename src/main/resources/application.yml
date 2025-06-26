@@ -34,6 +34,9 @@ spring:
           revision_type_field_name: rev_type
           store_data_at_delete: true
           default_schema: audit
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
   cloud:
     vault:
       uri: http://localhost:8200
@@ -143,7 +146,7 @@ datasource:
     password: admin
     driver-class-name: org.postgresql.Driver
   read:
-    url: jdbc:postgresql://localhost:5432/user_read_db
-    username: user
-    password: admin
+    url: jdbc:postgresql://localhost:5432/user_db
+    username: replicator
+    password: test
     driver-class-name: org.postgresql.Driver

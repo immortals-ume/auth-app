@@ -19,7 +19,27 @@ public class AuthAppConstant {
     public static final Long MAX_AGE_HSTS_SECS = 86400L;
 
 
-    public static final int MAX_TOKENS = 100;     // max tokens in bucket
+    public static final int MAX_TOKENS = 100;
     public static final int REFILL_TOKENS_PER_SECONDS = 10;
+
+    public static final String[] PUBLIC_RESOURCE_PATHS = {
+            "/redirect",
+            "/health",
+            "/actuator/**",
+            "/static/**",
+            "/webjars/**",
+            "/favicon.ico",
+            "/css/**",
+            "/js/**",
+            "/images/**"
+    };
+
+    public static final String[] ANONYMOUS_API_PATHS = {
+            "/api/v1/users/register",
+            "/api/v1/auth/login",
+            "/api/v1/auth/logout",
+            "/api/v1/auth/remember-me/"
+    };
+
 
 }

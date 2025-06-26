@@ -1,6 +1,5 @@
 package com.immortals.authapp.service;
 
-
 import com.immortals.authapp.model.dto.LoginDto;
 import com.immortals.authapp.model.dto.LoginResponse;
 import com.immortals.authapp.security.UserDetailsServiceImpl;
@@ -35,13 +34,15 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtProvider jwtProvider;
-    private final CacheService<String, String> cacheService;
+    private final CacheService<String, String, String> hashCacheService;
     private final UserService userService;
     private final HttpServletRequest request;
     private final TokenBlacklistService tokenBlacklistService;
 
     @Value("${auth.refresh-token-expiry-ms}")
     private int refreshTokenExpiryMs;
+
+    private static final String REFRESH_TOKEN_HASH_KEY = "refreshTokens";
 
     @Transactional
     @Override
@@ -62,8 +63,14 @@ public class AuthServiceImpl implements AuthService {
             String refreshToken = "";
             if (loginInfoDto.rememberMe()) {
                 refreshToken = jwtProvider.generateRefreshToken(authentication, refreshTokenExpiryMs);
-                String refreshTokenKey = "refreshToken:" + loginInfoDto.username();
-                cacheService.put(refreshTokenKey, refreshToken, jwtProvider.getExpiryTimeFromToken(refreshToken), loginInfoDto.username());
+                // Store in Redis hash: key="refreshTokens", field=username, value=refreshToken
+                hashCacheService.put(
+                        REFRESH_TOKEN_HASH_KEY,
+                        loginInfoDto.username(),
+                        refreshToken,
+                        Duration.ofMillis(refreshTokenExpiryMs),
+                        loginInfoDto.username()
+                );
                 log.info("🔁 Refresh token generated and cached for user '{}'.", loginInfoDto.username());
             }
 
@@ -71,7 +78,7 @@ public class AuthServiceImpl implements AuthService {
             return new LoginResponse(loginInfoDto.username(), accessToken, refreshToken);
 
         } catch (RuntimeException | IOException | NoSuchAlgorithmException | InvalidKeySpecException |
-                 JOSEException | ParseException e) {
+                 JOSEException e) {
             log.error("❌ Login failed for user '{}': {}", loginInfoDto.username(), e.getMessage(), e);
             throw new AuthException("Login failed. Please verify your credentials and try again.", e);
         }
@@ -80,19 +87,23 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String generateRefreshToken(String username) {
         try {
-            String refreshTokenKey = "refreshToken:" + username;
-            if (cacheService.containsKey(refreshTokenKey, username)) {
+            if (hashCacheService.containsKey(REFRESH_TOKEN_HASH_KEY, username, username)) {
                 log.info("ℹ️ Refresh token already exists for user '{}'.", username);
                 return "Refresh token already exists.";
             }
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-            );
+                    userDetails, null, userDetails.getAuthorities());
 
             String refreshToken = jwtProvider.generateRefreshToken(authentication, refreshTokenExpiryMs);
-            cacheService.put(refreshTokenKey, refreshToken, jwtProvider.getExpiryTimeFromToken(refreshToken), username);
+            hashCacheService.put(
+                    REFRESH_TOKEN_HASH_KEY,
+                    username,
+                    refreshToken,
+                    Duration.ofMillis(refreshTokenExpiryMs),
+                    username
+            );
 
             log.info("🔁 Refresh token generated for user '{}'.", username);
             return refreshToken;
@@ -125,7 +136,8 @@ public class AuthServiceImpl implements AuthService {
             String username = jwtProvider.getUsernameFromToken(token);
             if (ttlMillis > 0) {
                 tokenBlacklistService.blacklistToken(token, ttlMillis);
-                log.info("🛑 Token blacklisted for user '{}'.", username);
+                hashCacheService.remove(REFRESH_TOKEN_HASH_KEY, username, username);
+                log.info("🛑 Token blacklisted and refresh token removed for user '{}'.", username);
             } else {
                 log.info("⏳ Token for user '{}' already expired. Skipping blacklist.", username);
             }
@@ -138,4 +150,3 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 }
-
