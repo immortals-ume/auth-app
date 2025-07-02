@@ -6,7 +6,6 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
     min-response-size: 1024
 
-
 spring:
   application:
     name: auth-app
@@ -33,7 +32,7 @@ spring:
           revision_field_name: rev
           revision_type_field_name: rev_type
           store_data_at_delete: true
-          default_schema: audit
+          default_schema: user_audit
     generate-ddl: true
     hibernate:
       ddl-auto: update
@@ -120,6 +119,7 @@ auth:
   jwt-issuer: https://your-issuer.example.com
   access-token-expiry-ms: 900000
   refresh-token-expiry-ms: 604800000
+  guest-token-expiry-ms: 200390000
   cache:
     static-resources:
       max-age-seconds: 31536000

@@ -14,7 +14,14 @@ import java.io.Serializable;
 import java.util.Set;
 
 @Entity
-@Table(name = "countries", schema = "auth")
+@Table(
+        name = "countries",
+        schema = "user_auth",
+        indexes = {
+                @Index(name = "idx_countries_name", columnList = "country_name"),
+                @Index(name = "idx_countries_code", columnList = "country_code")
+        }
+)
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,7 +35,7 @@ public class Country extends Auditable<String> implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "country_name", nullable = false, unique = true)
+    @Column(name = "country_name", nullable = false, unique = true, length = 100)
     private String name;
 
     @Column(name = "country_code", nullable = false, unique = true, length = 5)
@@ -37,6 +44,6 @@ public class Country extends Auditable<String> implements Serializable {
     @OneToMany(mappedBy = "country")
     private Set<States> states;
 
-    @Column(name = "activeInd", nullable = false)
+    @Column(name = "active_ind", nullable = false)
     private Boolean activeInd;
 }

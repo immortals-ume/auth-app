@@ -17,74 +17,99 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "users", indexes = {@Index(name = "idx_user_username", columnList = "user_name"), @Index(name = "idx_user_email", columnList = "email"), @Index(name = "idx_user_phone", columnList = "contactNumber")
-
-}, uniqueConstraints = {}, schema = "auth")
-
+@Table(
+        name = "users",
+        schema = "user_auth",
+        indexes = {
+                @Index(name = "idx_user_username", columnList = "user_name"),
+                @Index(name = "idx_user_email", columnList = "email"),
+                @Index(name = "idx_user_contact_number", columnList = "contact_number"),
+                @Index(name = "idx_user_active_ind", columnList = "active_ind")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_user_username", columnNames = "user_name"),
+                @UniqueConstraint(name = "uk_user_email", columnNames = "email"),
+                @UniqueConstraint(name = "uk_user_contact_number", columnNames = "contact_number")
+        }
+)
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @Audited
-@Setter
 @EntityListeners(AuditingEntityListener.class)
 @ToString(exclude = {"userAddresses", "roles"})
 public class User extends Auditable<String> implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
-    @SequenceGenerator(name = "user_sequence", sequenceName = "auth.user_sequence", allocationSize = 1, initialValue = 1)
-    @Column(name = "user_id", unique = true, nullable = false, updatable = false, columnDefinition = "BIGINT")
+    @SequenceGenerator(
+            name = "user_sequence",
+            sequenceName = "auth.user_sequence",
+            allocationSize = 1,
+            initialValue = 1
+    )
+    @Column(name = "user_id", nullable = false, updatable = false)
     private Long userId;
 
     @NotBlank
-    @Column(name = "first_name", nullable = false)
+    @Size(max = 50)
+    @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
-    @NotBlank
-    @Column(name = "middle_name", nullable = false)
+    @Size(max = 50)
+    @Column(name = "middle_name", length = 50)
     private String middleName;
 
     @NotBlank
-    @Column(name = "last_name", nullable = false)
+    @Size(max = 50)
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
     @NotBlank
     @Size(min = 3, max = 16)
-    @Column(name = "user_name", nullable = false)
+    @Column(name = "user_name", nullable = false, length = 16, unique = true)
     private String userName;
 
     @JsonIgnore
-    @NotNull(message = "Password cannot be empty")
-    @Column(name = "password")
+    @NotBlank(message = "Password cannot be empty")
+    @Size(min = 8, max = 255)
+    @Column(name = "password", nullable = false, length = 255)
     private String password;
 
     @Email(message = "Email is not in correct format")
     @NotBlank
-    @Column(name = "email", nullable = false)
+    @Size(max = 100)
+    @Column(name = "email", nullable = false, length = 100, unique = true)
     private String email;
 
     @Email(message = "Email is not in correct format")
-    @Column(name = "alternate_email", nullable = true)
+    @Size(max = 100)
+    @Column(name = "alternate_email", length = 100)
     private String alternateEmail;
 
     @Column(name = "email_verified", nullable = false)
-    private Boolean emailVerified;
+    private Boolean emailVerified ;
 
     @NotBlank
-    @Column(name = "phone_code", nullable = false)
+    @Size(max = 5)
+    @Column(name = "phone_code", nullable = false, length = 5)
     private String phoneCode;
 
-    @Column(length = 10)
-    @Pattern(regexp = "^(\\+91)?[6-9][0-9]{9}$", message = "Contact number invalid")
+    @NotBlank
+    @Size(min = 10, max = 15)
+    @Pattern(regexp = "^(\\+\\d{1,4})?[6-9][0-9]{9}$", message = "Contact number invalid")
+    @Column(name = "contact_number", nullable = false, length = 15, unique = true)
     private String contactNumber;
 
-    @Column(length = 10)
-    @Pattern(regexp = "^(\\+91)?[6-9][0-9]{9}$", message = "Alternate contact invalid")
+    @Size(min = 10, max = 15)
+    @Pattern(regexp = "^(\\+\\d{1,4})?[6-9][0-9]{9}$", message = "Alternate contact invalid")
+    @Column(name = "alternate_contact", length = 15)
     private String alternateContact;
 
     @Column(name = "phone_number_verified", nullable = false)
-    private Boolean phoneNumberVerified;
+    private Boolean phoneNumberVerified = false;
 
     @Column(name = "login_time")
     private Instant login;
@@ -93,47 +118,31 @@ public class User extends Auditable<String> implements Serializable {
     private Instant logout;
 
     @Column(name = "account_non_expired", nullable = false)
-    private Boolean accountNonExpired;
+    private Boolean accountNonExpired ;
 
     @Column(name = "account_non_locked", nullable = false)
-    private Boolean accountNonLocked;
+    private Boolean accountNonLocked ;
 
     @Column(name = "account_locked", nullable = false)
-    private Boolean accountLocked;
+    private Boolean accountLocked ;
 
     @Column(name = "credentials_non_expired", nullable = false)
-    private Boolean credentialsNonExpired;
+    private Boolean credentialsNonExpired ;
 
     @Column(name = "active_ind", nullable = false)
-    private Boolean activeInd;
+    private Boolean activeInd ;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserAddress> userAddresses;
 
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
-
-    @JoinTable(name = "user_role", joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user_id")}, inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "role_id")}, schema = "auth")
+    @JoinTable(
+            name = "user_role",
+            schema = "user_auth",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "role_id")
+    )
     private Set<Roles> roles;
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer()
-                .getPersistentClass() : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer()
-                .getPersistentClass() : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) return false;
-        User user = (User) o;
-        return getUserId() != null && Objects.equals(getUserId(), user.getUserId());
-    }
-
-    @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer()
-                .getPersistentClass()
-                .hashCode() : getClass().hashCode();
-    }
 }

@@ -13,7 +13,17 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "cities", schema = "auth")
+@Table(
+        name = "cities",
+        schema = "user_auth",
+        indexes = {
+                @Index(name = "idx_cities_name", columnList = "city_name"),
+                @Index(name = "idx_cities_state_id", columnList = "state_id")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_cities_name_state", columnNames = {"city_name", "state_id"})
+        }
+)
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,14 +37,13 @@ public class City extends Auditable<String> implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "city_name", nullable = false)
+    @Column(name = "city_name", nullable = false, length = 100)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "state_id", nullable = false)
     private States states;
 
-
-    @Column(name = "activeInd", nullable = false)
+    @Column(name = "active_ind", nullable = false)
     private Boolean activeInd;
 }

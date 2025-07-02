@@ -1,4 +1,4 @@
-package com.immortals.authapp.model;
+package com.immortals.authapp.model.helper;
 
 import lombok.Getter;
 import lombok.Setter;

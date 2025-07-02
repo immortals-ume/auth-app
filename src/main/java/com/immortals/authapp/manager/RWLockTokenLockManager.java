@@ -37,7 +37,6 @@ public class RWLockTokenLockManager implements TokenLockManager {
 
     @Override
     public void acquireWrite(String key) {
-        // Default to 1 second timeout
         acquireWrite(key, Duration.ofSeconds(1));
     }
 

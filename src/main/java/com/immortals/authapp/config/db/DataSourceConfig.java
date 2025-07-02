@@ -1,6 +1,7 @@
 package com.immortals.authapp.config.db;
 
 
+import com.immortals.authapp.model.enums.DbType;
 import com.immortals.authapp.routing.RoutingDataSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -49,8 +50,8 @@ public class DataSourceConfig {
     @Bean
     public DataSource routingDataSource() {
         Map<Object, Object> targetDataSources = new HashMap<>();
-        targetDataSources.put("WRITE", writeDataSource(writeDataSourceProperties));
-        targetDataSources.put("READ", readDataSource(readDataSourceProperties));
+        targetDataSources.put(DbType.WRITE.name(), writeDataSource(writeDataSourceProperties));
+        targetDataSources.put(DbType.READ.name(), readDataSource(readDataSourceProperties));
 
         RoutingDataSource routingDataSource = new RoutingDataSource();
         routingDataSource.setTargetDataSources(targetDataSources);

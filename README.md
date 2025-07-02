@@ -1,92 +1,86 @@
 # Auth App
 
-## Overview
+A robust authentication and authorization service designed to provide secure access control for modern applications.
+Auth App supports multiple authentication mechanisms, advanced token management, and seamless integration with
+third-party services.
 
-Auth App is a robust authentication and authorization service designed to provide secure access control for
-applications. It includes various authentication mechanisms, token management, and third-party integration for a
-seamless authentication experience.
+## 🚀 Features
 
-## Features
+- **Username/Password Authentication**
+    - Secure login using email/username and password
+    - Password hashing with industry best practices
+    - Role-based access control (RBAC) for user privileges
 
-### 1. Username/Password Authentication
+- **Role-Based Access Control (RBAC)**
+    - Fine-grained access based on user roles and permissions
+    - Custom role definitions for flexibility
 
-- Secure login using email/username and password.
-- Password hashing and storage using industry best practices.
-- Role-based access control for different user privileges.
+- **Two-Factor Authentication (2FA) / OTP Service (Mobile/Email)**
+    - Additional security via OTP or app-based authenticators (TOTP)
+    - Optional enforcement for critical actions
+    - One-time password (OTP) generation and validation
+    - SMS and email OTP delivery support
+    - [Implemented in an OTP handling service (GitHub link to be added)](#)
 
-### 8. Role-Based Access Control (RBAC)
+- **Remember Me**
+    - Persistent login functionality
+    - Secure storage and expiration control for authentication tokens
 
-- Fine-grained access control based on user roles and permissions.
-- Custom role definitions for flexibility.
+- **Refresh Token**
+    - Secure refresh token mechanism for session extension
+    - Token expiration and revocation support
 
-### 3. OTP Service (Mobile/Email)
+- **Anonymous Authentication**
+    - Guest/anonymous user support with limited access
+    - Seamless upgrade from guest to registered user without losing session
 
-- implemented in a separate service called OTP Service (GITHUB LINK TO BE ADDED)
-- One-time password (OTP) generation and validation for enhanced security.
-- Support for SMS and email OTP delivery.
+- **Logout**
+    - Secure logout with token invalidation
+    - Global logout for all active sessions
 
-### 4. Two-Factor Authentication (2FA)
+- **Security Measures**
+    - JWT-based authentication
+    - Secure HTTPS communication
+    - Rate limiting and brute force protection
 
-- Additional layer of security using OTP or app-based authenticators (TOTP).
-- Optional enforcement of 2FA for critical actions.
+## 🛠️ Installation
 
-### 10. Remember Me
+1. **Clone the repository**
+    ```
+    git clone https://github.com/immortals-ume/auth-app.git
+    cd auth-app
+    ```
 
-- Persistent login functionality for a better user experience.
-- Secure storage of authentication tokens with expiration control.
+2. **Install dependencies**
+    ```
+    mvn clean install
+    ```
 
-### 5. Refresh Token
+3. **Configure environment variables**
+    - Edit `.env` or `src/main/resources/application.yml` as needed.
 
-- Secure refresh token mechanism to extend user sessions without re-authentication.
-- Expired token handling and revocation support.
+4. **Run the application**
+    ```
+    mvn spring-boot:run
+    ```
 
-### 7. Anonymous Authentication
+## 🔒 Security Best Practices
 
-- Support for guest/anonymous users with limited access.
-- Upgrade from anonymous to registered user without losing session data.
+- All authentication is JWT-based.
+- All sensitive communication should use HTTPS.
+- Built-in rate-limiting and brute force attack protection.
 
-### 6. Logout
+## 📄 License
 
-- Secure user logout with token invalidation.
-- Global logout for multiple active sessions.
+This project is licensed under the MIT LICENSE
 
-## Installation
+## 🤝 Contributing
 
-1. Clone the repository:
-   ```sh
-   git clone https://github.com/immortals-ume/auth-app.git
-   cd auth-app
-   ```
-2. Install dependencies:
-   ```sh
-   mvn clean install 
-   ```
-3. Configure environment variables in `.env` or `application.yml`.
+Contributions are welcome!  
+Please submit issues or pull requests and follow the coding standards and best practices.
 
-4. Run the application:
-   ```sh
-   mvn spring-boot:run
-   ```
-## Security Measures
+## 📬 Contact
 
-- JWT-based authentication.
-- Secure HTTPS communication.
-- Rate limiting and brute force protection.
-
-## License
-
-This project is licensed under the MIT License.
-
-## Contributing
-
-Feel free to contribute by submitting issues or pull requests. Follow the coding standards and best practices while
-contributing.
-
-## Contact
-
-For inquiries, contact **immortals-ume** at **srivastavakapil34@gmail.com**.
-
----
+For inquiries, contact **immortals-ume** at [srivastavakapil34@gmail.com](mailto:srivastavakapil34@gmail.com).
 
 *Happy Coding! 🚀*
-

@@ -12,12 +12,9 @@ public class AuthAppConstant {
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$";
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER_STRING = "Authorization";
-
     public static final String MDC_USER_AGENT_KEY = "userAgent";
-
     public static final Long MAX_AGE_CORS_SECS = 86400L;
     public static final Long MAX_AGE_HSTS_SECS = 86400L;
-
 
     public static final int MAX_TOKENS = 100;
     public static final int REFILL_TOKENS_PER_SECONDS = 10;
@@ -40,6 +37,4 @@ public class AuthAppConstant {
             "/api/v1/auth/logout",
             "/api/v1/auth/remember-me/"
     };
-
-
 }

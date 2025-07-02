@@ -33,12 +33,13 @@ public class JpaConfig {
     public JpaConfig(JpaPropertiesConfig jpaPropertiesConfig) {
         this.jpaPropertiesConfig = jpaPropertiesConfig;
     }
+
     @Bean
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
-        adapter.setGenerateDdl(true);
-        adapter.setShowSql(true);
-        adapter.setDatabasePlatform("org.hibernate.dialect.PostgreSQLDialect");
+        if (jpaPropertiesConfig.getDatabasePlatform() != null) {
+            adapter.setDatabasePlatform(jpaPropertiesConfig.getDatabasePlatform());
+        }
         return adapter;
     }
 
@@ -57,7 +58,6 @@ public class JpaConfig {
     @Bean(name = "entityManagerFactory")
     @DependsOn("routingDataSource")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(
-            @Qualifier("entityManagerFactoryBuilder") EntityManagerFactoryBuilder builder,
             @Qualifier("routingDataSource") DataSource routingDataSource) {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(routingDataSource);

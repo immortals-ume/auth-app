@@ -12,4 +12,5 @@ import java.util.Map;
 public class JpaPropertiesConfig {
     private Map<String, Object> hibernate;
     private Map<String, Object> org;
+    private String databasePlatform;
 }

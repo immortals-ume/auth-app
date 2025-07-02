@@ -1,6 +1,6 @@
 package com.immortals.authapp.security;
 
-import com.immortals.authapp.model.UserPrincipal;
+import com.immortals.authapp.model.helper.UserPrincipal;
 import com.immortals.authapp.model.entity.Permissions;
 import com.immortals.authapp.model.entity.Roles;
 import com.immortals.authapp.model.entity.User;

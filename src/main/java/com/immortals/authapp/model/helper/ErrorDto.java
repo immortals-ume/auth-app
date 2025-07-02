@@ -1,4 +1,4 @@
-package com.immortals.authapp.model.dto;
+package com.immortals.authapp.model.helper;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;

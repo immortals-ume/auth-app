@@ -25,6 +25,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize(" hasRole('GUEST') ")
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto register(@Valid @RequestBody RegisterRequestDTO dto) {

@@ -17,7 +17,16 @@ import java.io.Serializable;
 import java.util.Set;
 
 @Entity
-@Table(name = "permission", schema = "auth")
+@Table(
+        name = "permission",
+        schema = "user_auth",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_permission_name", columnNames = "permission_name")
+        },
+        indexes = {
+                @Index(name = "idx_permission_name", columnList = "permission_name")
+        }
+)
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,18 +38,18 @@ public class Permissions extends Auditable<String> implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "permission_id", nullable = false)
+    @Column(name = "permission_id", nullable = false, updatable = false)
     private Long permissionId;
 
-    @Column(name = "permission_name", length = 50)
+    @Column(name = "permission_name", nullable = false, length = 50)
     @NotNull
     private String permissionName;
 
-    @Column(name = "active_ind", length = 50)
+    @Column(name = "active_ind", nullable = false)
     @NotNull
     private Boolean activeInd;
 
     @ManyToMany(mappedBy = "permissions")
-    @JsonIgnore // Prevent recursion in APIs
+    @JsonIgnore
     private Set<Roles> roles;
 }

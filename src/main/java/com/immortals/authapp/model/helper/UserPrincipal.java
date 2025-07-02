@@ -1,4 +1,4 @@
-package com.immortals.authapp.model;
+package com.immortals.authapp.model.helper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.immortals.authapp.model.entity.Roles;

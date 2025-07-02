@@ -63,7 +63,6 @@ public class AuthServiceImpl implements AuthService {
             String refreshToken = "";
             if (loginInfoDto.rememberMe()) {
                 refreshToken = jwtProvider.generateRefreshToken(authentication, refreshTokenExpiryMs);
-                // Store in Redis hash: key="refreshTokens", field=username, value=refreshToken
                 hashCacheService.put(
                         REFRESH_TOKEN_HASH_KEY,
                         loginInfoDto.username(),
@@ -144,7 +143,7 @@ public class AuthServiceImpl implements AuthService {
 
             userService.updateLogoutStatus(username);
 
-        } catch (ParseException e) {
+        } catch (RuntimeException | ParseException e) {
             log.error("❌ Logout failed due to token parsing error.", e);
             throw new AuthException("Logout failed. Unable to process token.");
         }

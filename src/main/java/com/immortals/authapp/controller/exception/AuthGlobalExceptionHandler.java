@@ -1,6 +1,6 @@
 package com.immortals.authapp.controller.exception;
 
-import com.immortals.authapp.model.dto.ErrorDto;
+import com.immortals.authapp.model.helper.ErrorDto;
 import com.immortals.authapp.service.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;

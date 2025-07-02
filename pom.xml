@@ -176,13 +176,6 @@
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>${liquibase.version}</version>
-                <configuration>
-                    <changeLogFile>src/main/resources/db/changelog.xml</changeLogFile>
-                    <url>jdbc:postgresql://localhost:5432/auth_db?ssl=false&amp;currentSchema=user</url>
-                    <username>postgres</username>
-                    <password>postgres</password>
-                    <outputChangeLogFile>src/main/resources/db/changelog-v1/changelog-public-v1.xml</outputChangeLogFile>
-                </configuration>
             </plugin>
         </plugins>
     </build>

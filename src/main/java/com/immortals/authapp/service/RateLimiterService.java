@@ -1,6 +1,6 @@
 package com.immortals.authapp.service;
 
-import com.immortals.authapp.model.TokenBucket;
+import com.immortals.authapp.model.helper.TokenBucket;
 
 import com.immortals.authapp.service.cache.CacheService;
 import lombok.RequiredArgsConstructor;

@@ -4,7 +4,7 @@ info:
   description: "auth_app API"
   version: "1.0.0"
 servers:
-  - url: "https://auth_app"
+  - url: "http://localhost:8080/"
 paths:
   /api/v1/auth/login:
     get:

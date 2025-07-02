@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.immortals.authapp.constants.AuthAppConstant.HEADER_STRING;
@@ -26,6 +27,7 @@ public class AuthController {
 
     private final ValidateCredentials validateCredentials;
 
+    @PreAuthorize(" hasRole('GUEST') ")
     @GetMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginDto loginDto) {
         validateCredentials.validateLoginDto(loginDto);
@@ -38,12 +40,14 @@ public class AuthController {
                 .body(loginResponse);
     }
 
+    @PreAuthorize(" hasRole('GUEST') ")
     @GetMapping(value = "/refresh/{username}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(code = org.springframework.http.HttpStatus.OK)
     public String generateRefreshToken(@PathVariable @NotNull String username) {
        return  authService.generateRefreshToken(username);
     }
 
+    @PreAuthorize(" hasRole('GUEST') ")
     @DeleteMapping(value = "/logout", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(code = org.springframework.http.HttpStatus.NO_CONTENT)
     public void logout() {
