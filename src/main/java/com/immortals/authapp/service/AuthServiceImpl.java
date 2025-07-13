@@ -7,6 +7,7 @@ import com.immortals.authapp.security.jwt.JwtProvider;
 import com.immortals.authapp.service.cache.CacheService;
 import com.immortals.authapp.service.exception.AuthException;
 import com.immortals.authapp.service.user.UserService;
+import com.immortals.authapp.utils.CookieUtils;
 import com.nimbusds.jose.JOSEException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.text.ParseException;
 import java.time.Duration;
+import java.util.Optional;
+
+import static com.immortals.authapp.constants.CacheConstants.REFRESH_TOKEN_HASH_KEY;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +40,11 @@ public class AuthServiceImpl implements AuthService {
     private final JwtProvider jwtProvider;
     private final CacheService<String, String, String> hashCacheService;
     private final UserService userService;
-    private final HttpServletRequest request;
     private final TokenBlacklistService tokenBlacklistService;
+    private final CookieUtils cookieUtils;
 
     @Value("${auth.refresh-token-expiry-ms}")
     private int refreshTokenExpiryMs;
-
-    private static final String REFRESH_TOKEN_HASH_KEY = "refreshTokens";
 
     @Transactional
     @Override
@@ -74,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
             }
 
             userService.updateLoginStatus(loginInfoDto.username());
-            return new LoginResponse(loginInfoDto.username(), accessToken, refreshToken);
+            return new LoginResponse(loginInfoDto.username(), accessToken, refreshToken,"Successfully generated the Login Token");
 
         } catch (RuntimeException | IOException | NoSuchAlgorithmException | InvalidKeySpecException |
                  JOSEException e) {
@@ -84,11 +86,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String generateRefreshToken(String username) {
+    public LoginResponse generateRefreshToken(String username) {
         try {
             if (hashCacheService.containsKey(REFRESH_TOKEN_HASH_KEY, username, username)) {
                 log.info("ℹ️ Refresh token already exists for user '{}'.", username);
-                return "Refresh token already exists.";
+                return new LoginResponse(username,null,null,"Refresh token already exists.");
             }
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -105,8 +107,7 @@ public class AuthServiceImpl implements AuthService {
             );
 
             log.info("🔁 Refresh token generated for user '{}'.", username);
-            return refreshToken;
-
+            return new LoginResponse(username,null,refreshToken,"Refresh token generated for user");
         } catch (Exception e) {
             log.error("❌ Failed to generate refresh token for user '{}': {}", username, e.getMessage(), e);
             throw new AuthException("Unable to generate refresh token. Please try again later.", e);
@@ -114,38 +115,20 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void logout() {
+    public void logout(HttpServletRequest request) {
         try {
-            String authHeader = request.getHeader("Authorization");
 
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                log.warn("⚠️ Logout failed: Missing or invalid Authorization header.");
-                throw new AuthException("Invalid or missing Authorization header.");
+            Optional<String> token = cookieUtils.getRefreshTokenFromCookie(request) ;
+            if (token.isPresent()) {
+                tokenBlacklistService.blacklistToken(token.get(), refreshTokenExpiryMs);
+                userService.updateLogoutStatus(jwtProvider.getUsernameFromToken(token.get()));
+                log.info("Logout successful");
             }
-
-            String token = authHeader.substring(7);
-            if (!jwtProvider.validateToken(token)) {
-                log.warn("⚠️ Logout failed: Token is invalid or already expired.");
-                throw new AuthException("Invalid or expired token.");
-            }
-
-            Duration expiry = jwtProvider.getExpiryTimeFromToken(token);
-            long ttlMillis = expiry.toMillis() - System.currentTimeMillis();
-
-            String username = jwtProvider.getUsernameFromToken(token);
-            if (ttlMillis > 0) {
-                tokenBlacklistService.blacklistToken(token, ttlMillis);
-                hashCacheService.remove(REFRESH_TOKEN_HASH_KEY, username, username);
-                log.info("🛑 Token blacklisted and refresh token removed for user '{}'.", username);
-            } else {
-                log.info("⏳ Token for user '{}' already expired. Skipping blacklist.", username);
-            }
-
-            userService.updateLogoutStatus(username);
 
         } catch (RuntimeException | ParseException e) {
             log.error("❌ Logout failed due to token parsing error.", e);
             throw new AuthException("Logout failed. Unable to process token.");
         }
+
     }
 }

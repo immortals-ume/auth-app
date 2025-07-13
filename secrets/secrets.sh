@@ -6,6 +6,7 @@ VAULT_ADDR="http://127.0.0.1:8200"
 
 echo "🔐 Writing secrets to Vault path: $VAULT_PATH"
 
+# shellcheck disable=SC1009
 docker exec -e VAULT_ADDR=$VAULT_ADDR -e VAULT_TOKEN=root $VAULT_CONTAINER_NAME vault kv put $VAULT_PATH \
   spring.liquibase.default-schema=<YOUR_DEFAULT_SCHEMA> \
   spring.liquibase.liquibase-schema=<YOUR_LIQUIBASE_SCHEMA> \

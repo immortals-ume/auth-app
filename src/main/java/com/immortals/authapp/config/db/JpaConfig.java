@@ -1,5 +1,6 @@
 package com.immortals.authapp.config.db;
 
+import com.immortals.authapp.model.properties.JpaProperties;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,17 +29,17 @@ import java.util.Map;
         transactionManagerRef = "transactionManager"
 )
 public class JpaConfig {
-    private final JpaPropertiesConfig jpaPropertiesConfig;
+    private final JpaProperties jpaProperties;
 
-    public JpaConfig(JpaPropertiesConfig jpaPropertiesConfig) {
-        this.jpaPropertiesConfig = jpaPropertiesConfig;
+    public JpaConfig(JpaProperties jpaProperties) {
+        this.jpaProperties = jpaProperties;
     }
 
     @Bean
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
-        if (jpaPropertiesConfig.getDatabasePlatform() != null) {
-            adapter.setDatabasePlatform(jpaPropertiesConfig.getDatabasePlatform());
+        if (jpaProperties.getDatabasePlatform() != null) {
+            adapter.setDatabasePlatform(jpaProperties.getDatabasePlatform());
         }
         return adapter;
     }
@@ -67,12 +68,12 @@ public class JpaConfig {
 
         Map<String, Object> jpaProps = new HashMap<>();
 
-        if (jpaPropertiesConfig.getHibernate() != null)
-            jpaProps.putAll(jpaPropertiesConfig.getHibernate());
+        if (jpaProperties.getHibernate() != null)
+            jpaProps.putAll(jpaProperties.getHibernate());
 
-        if (jpaPropertiesConfig.getOrg() != null) {
+        if (jpaProperties.getOrg() != null) {
 
-            Map<String, Object> org = jpaPropertiesConfig.getOrg();
+            Map<String, Object> org = jpaProperties.getOrg();
             if (org.containsKey("hibernate")) {
                 Object envers = ((Map<?, ?>) org.get("hibernate")).get("envers");
                 if (envers instanceof Map<?, ?> enversMap) {

@@ -1,5 +1,6 @@
 package com.immortals.authapp.config.security;
 
+import com.immortals.authapp.model.properties.CorsProperties;
 import com.immortals.authapp.security.filters.JwtAuthenticationFilter;
 import com.immortals.authapp.security.provider.AuthEntryPoint;
 import lombok.RequiredArgsConstructor;

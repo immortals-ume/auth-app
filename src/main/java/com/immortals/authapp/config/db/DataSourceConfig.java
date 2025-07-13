@@ -2,12 +2,13 @@ package com.immortals.authapp.config.db;
 
 
 import com.immortals.authapp.model.enums.DbType;
+import com.immortals.authapp.model.properties.ReadDataSourceProperties;
+import com.immortals.authapp.model.properties.WriteDataSourceProperties;
 import com.immortals.authapp.routing.RoutingDataSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

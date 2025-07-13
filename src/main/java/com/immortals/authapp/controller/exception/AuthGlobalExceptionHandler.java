@@ -37,18 +37,6 @@ public class AuthGlobalExceptionHandler extends ResponseEntityExceptionHandler {
         super();
     }
 
-
-    /**
-     * Handling Bad Request For POST method and PUT method
-     * <ol>
-     *     <li>field level validation</li>
-     *     <li>json level validation</li>
-     *     <li>Type Mismatch</li>
-     *     <li>Missing Servlet Request Parameter</li>
-     *     <li>Missing Path Variable</li>
-     *     <li>handleMethodArgumentTypeMismatch</li>
-     * </ol>
-     */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(@NotNull MethodArgumentNotValidException methodArgumentNotValidException, @NotNull HttpHeaders headers, @NotNull HttpStatusCode status, @NotNull WebRequest request) {
@@ -160,13 +148,6 @@ public class AuthGlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDto, new HttpHeaders(), errorDto.getStatus());
     }
 
-
-    /**
-     * Handling Internal Server Error For any type of Request
-     *
-     * @param e exception thrown at the service level
-     * @return Error Response Entity
-     */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({Exception.class})
     public ResponseEntity<ErrorDto> handleAll(final Exception e, HttpServletRequest request) {

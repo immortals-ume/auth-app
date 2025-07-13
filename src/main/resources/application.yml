@@ -138,6 +138,10 @@ auth:
       - "*"
     allow-credentials: true
     max-age: 31536000
+  cookie:
+    max-age: 604800
+    secure : true
+
 
 datasource:
   write:

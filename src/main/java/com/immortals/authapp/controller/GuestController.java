@@ -31,4 +31,5 @@ public class GuestController {
                 .headers(responseHeaders)
                 .body("Guest Token generate successfully");
     }
+
 }

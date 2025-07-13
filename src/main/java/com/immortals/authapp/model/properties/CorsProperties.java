@@ -1,4 +1,4 @@
-package com.immortals.authapp.config.security;
+package com.immortals.authapp.model.properties;
 
 import lombok.Getter;
 import lombok.Setter;

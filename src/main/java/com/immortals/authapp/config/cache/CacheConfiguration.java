@@ -1,6 +1,7 @@
 package com.immortals.authapp.config.cache;
 
 
+import com.immortals.authapp.model.properties.CacheProperties;
 import io.lettuce.core.ClientOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
