@@ -2,6 +2,7 @@ package com.immortals.authapp.security.filters;
 
 import com.immortals.authapp.security.exception.JwtNotFoundException;
 import com.immortals.authapp.security.jwt.JwtProvider;
+import com.immortals.authapp.service.RedisTokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
