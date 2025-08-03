@@ -3,6 +3,7 @@ package com.immortals.authapp.service.user;
 import com.immortals.authapp.annotation.ReadOnly;
 import com.immortals.authapp.annotation.WriteOnly;
 import com.immortals.authapp.model.dto.RegisterRequestDTO;
+import com.immortals.authapp.model.dto.ResetCredentials;
 import com.immortals.authapp.model.dto.UserAddressDTO;
 import com.immortals.authapp.model.dto.UserDto;
 import com.immortals.authapp.model.entity.User;
@@ -102,10 +103,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public String resetPassword(ResetCredentials resetCredentials) {
+        return "";
+    }
+
     @WriteOnly
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = {Exception.class})
     @Override
-    public User updateLoginStatus(String username) {
+    public void updateLoginStatus(String username) {
         try {
             User user = getUserByUsername(username);
 
@@ -114,7 +120,7 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedDate(DateTimeUtils.now());
 
             log.info("Login timestamp updated for user: [username={}]", username);
-            return userRepository.saveAndFlush(user);
+            userRepository.saveAndFlush(user);
 
         } catch (ResourceNotFoundException e) {
             log.warn("Login update failed: User not found with username={}", username);
@@ -128,7 +134,7 @@ public class UserServiceImpl implements UserService {
     @WriteOnly
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED, rollbackFor = {Exception.class})
     @Override
-    public User updateLogoutStatus(String username) {
+    public void updateLogoutStatus(String username) {
         try {
             User user = getUserByUsername(username);
 
@@ -137,7 +143,7 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedDate(DateTimeUtils.now());
 
             log.info("Logout timestamp updated for user: [username={}]", username);
-            return userRepository.saveAndFlush(user);
+            userRepository.saveAndFlush(user);
 
         } catch (ResourceNotFoundException e) {
             log.warn("Logout update failed: User not found with username={}", username);
@@ -166,6 +172,11 @@ public class UserServiceImpl implements UserService {
             log.error("Error retrieving user by username: {}", username, e);
             throw new AuthException("Failed to retrieve user details.");
         }
+    }
+
+    @Override
+    public String sendChangePasswordEmail(String username) {
+        return "";
     }
 
     @WriteOnly

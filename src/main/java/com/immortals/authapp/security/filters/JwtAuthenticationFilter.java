@@ -38,14 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final UserDetailsService userDetailsService;
     private final RedisTokenBlacklistService tokenBlacklistService;
-    private final List<String> excludedMatchers = List.of("/api/v1/auth/register", "/api/v1/auth/login", "/api/v1/auth/verify");
-
-    @Override
-    protected boolean shouldNotFilter(@NonNull HttpServletRequest httpServletRequest) {
-        return excludedMatchers.stream()
-                .anyMatch(httpServletRequest.getRequestURI()::contains);
-    }
-
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -56,10 +48,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (jwtProvider.validateToken(jwt)) {
                 String username = jwtProvider.getUsernameFromToken(jwt);
-                List<String> permissions = jwtProvider.getPermissionsFromToken(jwt); // <- custom method
+                List<String> permissions = jwtProvider.getPermissionsFromToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                // Combine authorities from both UserDetails and JWT permissions
                 List<GrantedAuthority> combinedAuthorities = Stream.concat(
                         userDetails.getAuthorities().stream(),
                         permissions.stream().map(SimpleGrantedAuthority::new)

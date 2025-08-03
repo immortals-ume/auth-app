@@ -27,9 +27,7 @@ public class RedisHashCacheService<H, HK, HV> implements CacheService<H, HK, HV>
     private final ReentrantLock metricsLock = new ReentrantLock();
     private final TokenLockManager tokenLockManager;
 
-    public RedisHashCacheService(
-            @Qualifier("redisTemplate") RedisTemplate<H, Object> redisTemplate,
-            TokenLockManager tokenLockManager) {
+    public RedisHashCacheService(@Qualifier("redisTemplate") RedisTemplate<H, Object> redisTemplate, TokenLockManager tokenLockManager) {
         this.redisTemplate = redisTemplate;
         this.hashOps = redisTemplate.opsForHash();
         this.tokenLockManager = tokenLockManager;
@@ -68,10 +66,13 @@ public class RedisHashCacheService<H, HK, HV> implements CacheService<H, HK, HV>
     @Override
     public void remove(H key, HK hashKey, String lockingKey) {
         try {
+            if (lockingKey != null) tokenLockManager.acquireRead(lockingKey, Duration.ofSeconds(1));
             hashOps.delete(key, hashKey);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException | InterruptedException e) {
             log.error("Redis Hash DELETE failed for key [{}] field [{}]: {}", key, hashKey, e.getMessage(), e);
             throw new CacheException("Failed to remove hash field", e);
+        } finally {
+            if (lockingKey != null) tokenLockManager.releaseRead(lockingKey);
         }
     }
 
@@ -101,8 +102,31 @@ public class RedisHashCacheService<H, HK, HV> implements CacheService<H, HK, HV>
         }
     }
 
-    public Long getHitCount() { return hits.get(); }
-    public Long getMissCount() { return misses.get(); }
+    @Override
+    public Long increment(H hashKey, HV fieldKey, String lockingKey, Duration ttl) {
+        try {
+            if (lockingKey != null) tokenLockManager.acquireRead(lockingKey, Duration.ofSeconds(1));
+            Long attempts = redisTemplate.opsForHash()
+                    .increment(hashKey, fieldKey, 1L);
+            if (attempts == 1) {
+                redisTemplate.expire(hashKey, ttl);
+            }
+            return attempts;
+        } catch (DataAccessException | InterruptedException e) {
+            throw new CacheException("Failed to update  hash fields", e);
+        } finally {
+            if (lockingKey != null) tokenLockManager.releaseRead(lockingKey);
+        }
+    }
+
+
+    public Long getHitCount() {
+        return hits.get();
+    }
+
+    public Long getMissCount() {
+        return misses.get();
+    }
 
     public void resetMetrics() {
         metricsLock.lock();

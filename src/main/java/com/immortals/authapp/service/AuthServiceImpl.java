@@ -42,23 +42,34 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final TokenBlacklistService tokenBlacklistService;
     private final CookieUtils cookieUtils;
+    private final LoginAttempt loginAttempt;
 
     @Value("${auth.refresh-token-expiry-ms}")
     private int refreshTokenExpiryMs;
+
 
     @Transactional
     @Override
     public LoginResponse login(LoginDto loginInfoDto) {
         try {
+            String username = loginInfoDto.username();
+
+            if (loginAttempt.isBlocked(username)) {
+                log.warn("🚫 Login attempt blocked for user '{}'", username);
+                throw new AuthException("Your account is temporarily locked due to too many failed login attempts. Please try again later.");
+            }
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginInfoDto.username(), loginInfoDto.password())
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             if (!authentication.isAuthenticated()) {
+                loginAttempt.loginFailed(username);
                 throw new AuthException("Authentication failed. Please check your credentials.");
             }
 
+            loginAttempt.loginSucceeded(username);
             String accessToken = jwtProvider.generateAccessToken(authentication);
             log.info("✅ User '{}' successfully authenticated.", loginInfoDto.username());
 

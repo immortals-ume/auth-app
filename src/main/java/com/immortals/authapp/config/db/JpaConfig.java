@@ -4,6 +4,7 @@ import com.immortals.authapp.model.properties.JpaProperties;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,7 @@ import java.util.Map;
         entityManagerFactoryRef = "entityManagerFactory",
         transactionManagerRef = "transactionManager"
 )
+@EntityScan(basePackages = "com.immortals.authapp.model.properties")
 public class JpaConfig {
     private final JpaProperties jpaProperties;
 
@@ -59,7 +61,7 @@ public class JpaConfig {
     @Bean(name = "entityManagerFactory")
     @DependsOn("routingDataSource")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(
-            @Qualifier("routingDataSource") DataSource routingDataSource) {
+            @Qualifier("routingDataSource") DataSource routingDataSource, JpaProperties jpaProperties) {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(routingDataSource);
         emf.setPackagesToScan("com.immortals.authapp.model.entity");
@@ -71,17 +73,8 @@ public class JpaConfig {
         if (jpaProperties.getHibernate() != null)
             jpaProps.putAll(jpaProperties.getHibernate());
 
-        if (jpaProperties.getOrg() != null) {
-
-            Map<String, Object> org = jpaProperties.getOrg();
-            if (org.containsKey("hibernate")) {
-                Object envers = ((Map<?, ?>) org.get("hibernate")).get("envers");
-                if (envers instanceof Map<?, ?> enversMap) {
-                    enversMap.forEach((k, v) -> {
-                        jpaProps.put("org.hibernate.envers." + k, v);
-                    });
-                }
-            }
+        if (!jpaProps.containsKey("hibernate.dialect")) {
+            jpaProps.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         }
 
         emf.setJpaPropertyMap(jpaProps);

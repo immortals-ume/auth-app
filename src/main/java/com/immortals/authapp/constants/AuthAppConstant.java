@@ -4,6 +4,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
+
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AuthAppConstant {
@@ -18,6 +20,9 @@ public class AuthAppConstant {
 
     public static final int MAX_TOKENS = 100;
     public static final int REFILL_TOKENS_PER_SECONDS = 10;
+
+    public static final int MAX_ATTEMPTS = 5;
+    public static final Duration BLOCK_DURATION = Duration.ofMinutes(15);
 
     public static final String[] PUBLIC_RESOURCE_PATHS = {
             "/redirect",

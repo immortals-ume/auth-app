@@ -44,4 +44,7 @@ public interface CacheService<H, HK, HV> {
      * Get cache miss count.
      */
     default Long getMissCount() { return 0L; }
+
+    Long increment(H hashKey, HV fieldKey, String lockingKey, Duration blockDuration);
+
 }

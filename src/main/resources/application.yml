@@ -45,7 +45,7 @@ spring:
         backend: secret
         default-context: "kv/springboot-vault-docker"
   config:
-    import: vault://
+    import: optional:vault://
 
 eureka:
   client:

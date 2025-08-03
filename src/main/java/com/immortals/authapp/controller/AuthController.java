@@ -17,8 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 import static com.immortals.authapp.constants.AuthAppConstant.HEADER_STRING;
 import static com.immortals.authapp.constants.AuthAppConstant.TOKEN_PREFIX;
 
@@ -29,7 +27,6 @@ import static com.immortals.authapp.constants.AuthAppConstant.TOKEN_PREFIX;
 public class AuthController {
 
     private final AuthService authService;
-
     private final ValidateCredentials validateCredentials;
     private final CookieUtils cookieUtils;
 
@@ -45,7 +42,7 @@ public class AuthController {
                 .body(loginResponse.message());
     }
 
-
+    @PreAuthorize(" hasRole('GUEST') ")
     @GetMapping(value = "/refresh/{username}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(code = org.springframework.http.HttpStatus.OK)
     public ResponseEntity<String> generateRefreshToken(@PathVariable @NotNull String username, HttpServletResponse response) {

@@ -2,6 +2,7 @@ package com.immortals.authapp.controller.users;
 
 
 import com.immortals.authapp.model.dto.RegisterRequestDTO;
+import com.immortals.authapp.model.dto.ResetCredentials;
 import com.immortals.authapp.model.dto.UserAddressDTO;
 import com.immortals.authapp.model.dto.UserDto;
 import com.immortals.authapp.model.entity.User;
@@ -36,8 +37,22 @@ public class UserController {
     @PreAuthorize(" hasRole('ADMIN') or hasRole('ROLE_USER') and hasAnyAuthority('READ')")
     @GetMapping("/{username}")
     @ResponseStatus(HttpStatus.CREATED)
-    public User register( @PathVariable String username) {
+    public User getUser(@PathVariable String username) {
         return userService.getUserByUsername(username);
+    }
+
+    @PreAuthorize(" hasRole('ADMIN') or hasRole('ROLE_USER') and hasAnyAuthority('SEND_EMAIL')")
+    @PostMapping("/change-password-email/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public String sendChangePasswordEmail(@PathVariable String username) {
+        return userService.sendChangePasswordEmail(username);
+    }
+
+    @PreAuthorize(" hasRole('ADMIN') or hasRole('ROLE_USER') and hasAnyAuthority('UPDATE')")
+    @PatchMapping("/change-password")
+    @ResponseStatus(HttpStatus.OK)
+    public String changePassword(@RequestBody ResetCredentials resetCredentials) {
+        return userService.resetPassword(resetCredentials);
     }
 
 
