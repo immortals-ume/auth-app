@@ -14,13 +14,13 @@ import static com.immortals.authapp.constants.AuthAppConstant.HEADER_STRING;
 import static com.immortals.authapp.constants.AuthAppConstant.TOKEN_PREFIX;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/guest")
 @RequiredArgsConstructor
 @Slf4j
 public class GuestController {
     private final GuestService guestService;
 
-    @GetMapping(value = "/guest-login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> loginWithGuestCredentials() {
 
         HttpHeaders responseHeaders = new HttpHeaders();

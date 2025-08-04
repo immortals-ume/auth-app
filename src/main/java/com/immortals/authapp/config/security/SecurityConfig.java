@@ -81,7 +81,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; script-src 'self' cdn.example.com; object-src 'none';"))
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::deny)
                         .xssProtection(HeadersConfigurer.XXssConfig::disable)
-                        .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true)
+                        .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(Boolean.TRUE)
                                 .maxAgeInSeconds(MAX_AGE_HSTS_SECS)))
                 .requiresChannel(channel -> channel
                         .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)

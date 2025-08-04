@@ -34,7 +34,7 @@ public class CookieUtils {
         }
 
         return Arrays.stream(request.getCookies())
-                .filter(c ->REFRESH_TOKEN_HASH_KEY.equals(c.getName()))
+                .filter(c -> REFRESH_TOKEN_HASH_KEY.equals(c.getName()))
                 .map(Cookie::getValue)
                 .findFirst();
     }

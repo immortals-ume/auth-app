@@ -32,4 +32,6 @@ build/
 .vscode/
 
 vault_output.log
-secrets.sh
+/secrets/jwt-keys/private_key.pem
+/secrets/jwt-keys/public_key.pem
+!/src/main/resources/jwt-keys/
